@@ -1,0 +1,34 @@
+//imp
+
+I got this after some research, hope it helps.
+
+
+The statement "blocking threads are non-blocking" is not entirely accurate. It's important to make a distinction between the nature of the operation and the execution model:
+
+Nature of the operation: A blocking operation is one that suspends the execution of the current thread until it completes. This means that while the thread is waiting, it cannot execute any other code.
+Execution model: Node.js utilizes a single-threaded event loop with a pool of worker threads. The event loop is responsible for handling non-blocking I/O and scheduling tasks. Worker threads are used to execute blocking operations asynchronously.
+Therefore, while an individual operation might be blocking, the execution model in Node.js utilizes worker threads and the event loop to manage these blocking operations in a non-blocking manner. This allows the main thread to remain responsive and handle other tasks while the blocking operations are running in the background.
+
+Here's a more accurate way to express the concept:
+
+Node.js can handle blocking operations in a non-blocking way by utilizing worker threads and the event loop.
+
+This statement clarifies that the blocking nature of individual operations doesn't prevent Node.js from being a non-blocking environment overall.
+
+------------------------------------------------------------------------------------
+
+
+Yes, that's correct. Node.js internally decides whether a task will run on the main thread or a worker thread based on several factors, including:
+
+* *Nature of the operation:* Long-running and blocking operations are more likely to be assigned to worker threads, while short-lived and non-blocking tasks are typically handled by the main thread.
+* *Available resources:* Node.js considers the available CPU cores and memory when deciding whether to utilize worker threads. If resources are limited, it might prefer to run even blocking tasks on the main thread to avoid overhead.
+* *Application configuration:* Some libraries and frameworks might specify how certain tasks should be handled, influencing whether they run on the main thread or a worker thread.
+* *Node.js version and configuration:* Different versions of Node.js and specific configurations might have different heuristics for deciding when to use worker threads.
+
+Even for blocking operations like `fs.readFileSync`, Node.js might choose to execute them on the main thread if:
+
+* The operation is very fast and doesn't significantly block the main thread.
+* Utilizing a worker thread would introduce more overhead than simply waiting for the operation to finish on the main thread.
+* The application is running on a system with limited resources, and using a worker thread would be detrimental to performance.
+
+Ultimately, Node.js aims to optimize performance and resource utilization by intelligently allocating tasks between the main thread and worker threads. While developers can influence this behavior through libraries, frameworks, and application architecture, the final decision ultimately rests with the Node.js runtime based on its internal analysis.
